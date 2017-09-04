@@ -7,11 +7,15 @@ using OEngine.Managers;
 
 namespace OEngine.ComponentSystem.Components
 {
-    public class ParticleEmitterComponent : BaseComponent
+    public abstract class ScriptComponent : BaseComponent
     {
-        public ParticleEmitterComponent(Managers.Managers handler) : base(handler)
+      
+
+        public ScriptComponent() : base(Managers.Managers.SCRIPTS)
         {
         }
+
+      
 
         public override BaseComponent Clone()
         {
@@ -35,12 +39,12 @@ namespace OEngine.ComponentSystem.Components
 
         public override void Subscribe()
         {
-            throw new NotImplementedException();
+            World.GameLogicSystem.Subscribe(this);
         }
 
         public override void Unsubscribe()
         {
-            throw new NotImplementedException();
+            World.GameLogicSystem.Unsubscribe(this);
         }
     }
 }

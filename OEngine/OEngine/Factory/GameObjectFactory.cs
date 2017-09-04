@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OpenGL.Factory
+namespace OEngine.Factory
 {
     public class GameObjectFactory
     {

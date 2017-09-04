@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK;
 
-namespace OpenGL
+namespace OEngine
 {
     public class TextureImage
     {
@@ -15,16 +15,17 @@ namespace OpenGL
         public int Width { get; set; }
         public int Height { get; set; }
 
-        public List<TextureFrame> Frames { get; set; } = new List<TextureFrame>();
+        public TextureFrame[,] Frames { get; set; } = new TextureFrame[0,0];
 
         public void Subdivide(int nx, int ny)
         {
+            Frames = new TextureFrame[nx, ny];
             var frameWidth = Width / nx;
             var frameHeight = Height / ny;
 
             for (var i = 0; i < nx; i++)
                 for (var j = 0; j < ny; j++)
-                    Frames.Add(new TextureFrame(this,frameWidth, frameHeight, frameWidth * i, frameHeight * i));
+                    Frames[i,j] = new TextureFrame(this,frameWidth, frameHeight, frameWidth * i, frameHeight * j);
         }
     }
 

@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 
-namespace OpenGL.ComponentSystem
+namespace OEngine.ComponentSystem
 {
     public class Component : Attribute
     {

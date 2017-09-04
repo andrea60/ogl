@@ -1,4 +1,4 @@
-﻿using OpenGL.Managers;
+﻿using OEngine.Managers;
 using OpenTK;
 using System;
 using System.Collections.Generic;
@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using OpenTK.Graphics.OpenGL4;
 
-namespace OpenGL.ComponentSystem.Components
+namespace OEngine.ComponentSystem.Components
 {
     [Component("LightComponent")]
     public class LightComponent : BaseComponent
@@ -40,11 +40,11 @@ namespace OpenGL.ComponentSystem.Components
         
         public float LightIntensity = 20;
 
-        public LightComponent(float radius)
+        public LightComponent(float radius) : base(Managers.Managers.RENDERER)
         {
             Radius = radius;
         }
-        public LightComponent()
+        public LightComponent() : base(Managers.Managers.RENDERER)
         {
             Radius = 1f;   
         }
@@ -74,8 +74,6 @@ namespace OpenGL.ComponentSystem.Components
             GL.EnableVertexAttribArray(0);
             GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 0, 0);
 
-            DisplayManager.AddSceneLight(this);
-
         }
 
 
@@ -87,21 +85,18 @@ namespace OpenGL.ComponentSystem.Components
             TranslationMatrix[2, 3] = GameObject.Position.Z;
 
 
-            DisplayManager.CurrentProgram.UniformValue("t_mat", TranslationMatrix);
-            DisplayManager.CurrentProgram.UniformValue("s_mat", ScaleMatrix);
-            DisplayManager.CurrentProgram.UniformValue("light_center", LightCenter);
-            DisplayManager.CurrentProgram.UniformValue("light_color", LightColor);
-            DisplayManager.CurrentProgram.UniformValue("light_intensity", LightIntensity);
+            World.RenderSystem.CurrentProgram.UniformValue("t_mat", TranslationMatrix);
+            World.RenderSystem.CurrentProgram.UniformValue("s_mat", ScaleMatrix);
+            World.RenderSystem.CurrentProgram.UniformValue("light_center", LightCenter);
+            World.RenderSystem.CurrentProgram.UniformValue("light_color", LightColor);
+            World.RenderSystem.CurrentProgram.UniformValue("light_intensity", LightIntensity);
 
 
             GL.BindVertexArray(VAO);
             GL.DrawArrays(PrimitiveType.Triangles, 0, 6);
 
         }
-        public override void OnDestroy()
-        {
-            DisplayManager.RemoveSceneLight(this);
-        }
+       
 
         public override bool MustUpdateEachFrame()
         {
@@ -121,6 +116,20 @@ namespace OpenGL.ComponentSystem.Components
                 VBO = VBO,
                 VAO = VAO
             };
+        }
+
+        public override void Subscribe()
+        {
+            World.RenderSystem.Subscribe(this);
+        }
+        public override void Unsubscribe()
+        {
+            World.RenderSystem.Unsubscribe(this);
+        }
+
+        public override void OnDestroy()
+        {
+     
         }
     }
   

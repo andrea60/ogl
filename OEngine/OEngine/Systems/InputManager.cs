@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OpenGL
+namespace OEngine
 {
     public static class InputManager
     {

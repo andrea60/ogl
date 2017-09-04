@@ -1,4 +1,4 @@
-﻿using OpenGL.ComponentSystem.Components;
+﻿using OEngine.ComponentSystem.Components;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL4;
@@ -12,7 +12,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OpenGL.Managers
+namespace OEngine.Managers
 {
     public enum MatrixType
     {
@@ -21,41 +21,46 @@ namespace OpenGL.Managers
         ProjectionMatrix
     }
 
-    public static class DisplayManager
+    public class DisplayManager
     {
-        private static bool Debug;
+        private bool Debug;
 
-        static int Width = 1280, Height =720;
-        static readonly int VWidth = 1280, VHeight = 720;
-        static Vector2 Scale;
+        int Width = 1280, Height =720;
+        readonly int VWidth = 1280, VHeight = 720;
+        Vector2 Scale;
 
-        static INativeWindow Window;
-        static IGraphicsContext Context;
-        static int Frames = 0;
-        static DateTime LastFrameRateUpdate = DateTime.Now;
+        INativeWindow Window;
+        IGraphicsContext Context;
+        int Frames = 0;
+        DateTime LastFrameRateUpdate = DateTime.Now;
 
-        public static Camera MainCamera { get; set; }
+        public Camera MainCamera { get; set; } = new Camera();
 
-        public static bool CloseRequested = false;
+        public bool CloseRequested = false;
 
-        private static TextureUnit CurrentMaxTexture = TextureUnit.Texture0;
+        private TextureUnit CurrentMaxTexture = TextureUnit.Texture0;
+        /// <summary>
+        /// Gets or sets the ambient light. To disable lightning simply set to [1f,1f,1f]
+        /// </summary>
+        public Vector3 AmbientLight = new Vector3(1f,1f,1f);
 
-        private static List<LightComponent> SceneLights = new List<LightComponent>();
-
-        private static FBO MainFBO;
-        private static FBO LightningFBO;
+        private FBO MainFBO;
+        private FBO LightningFBO;
 
 
-        private static float[] SceneVertex;
-        private static float[] SceneUV;
-        private static uint SceneVertexVBO;
-        private static uint SceneTextureVBO;
-        private static uint SceneVAO;
+        private float[] SceneVertex;
+        private float[] SceneUV;
+        private uint SceneVertexVBO;
+        private uint SceneTextureVBO;
+        private uint SceneVAO;
 
-        private static GLProgram BlenderProgram, LightProgram, MainProgram;
-        public static GLProgram CurrentProgram;
+        private GLProgram BlenderProgram, LightProgram, MainProgram;
+        public GLProgram CurrentProgram;
 
-        public static void Initialize(bool debug)
+        private List<Renderer2DComponent> Sprites = new List<Renderer2DComponent>();
+        private List<LightComponent> Lights = new List<LightComponent>();
+
+        public void Initialize(bool debug)
         {
             Debug = debug;
             var graphicsMode = new GraphicsMode(32, 24, 0, 8);
@@ -89,19 +94,19 @@ namespace OpenGL.Managers
             GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
 
             
-            MainProgram = new OpenGL.GLProgram(CreateGLProgram("Basic"));
+            MainProgram = new OEngine.GLProgram(CreateGLProgram("Basic"));
             MainProgram.AddUniform("view", UniformType.Matrix4);
             MainProgram.AddUniform("model", UniformType.Matrix4);
             MainProgram.AddUniform("stretch_scale", UniformType.Vector2);
             //GLProgram = CreateGLProgram("Basic");
-            BlenderProgram = new OpenGL.GLProgram(CreateGLProgram("Blender"));
+            BlenderProgram = new OEngine.GLProgram(CreateGLProgram("Blender"));
 
             BlenderProgram.AddUniform("first_tex", UniformType.Integer);
             BlenderProgram.AddUniform("second_tex", UniformType.Integer);
 
 
             //var GLBlenderProgram = CreateGLProgram("Blender");
-            LightProgram = new OpenGL.GLProgram(CreateGLProgram("Light"));
+            LightProgram = new OEngine.GLProgram(CreateGLProgram("Light"));
             LightProgram.AddUniform("light_center", UniformType.Vector3);
             LightProgram.AddUniform("t_mat", UniformType.Matrix4);
             LightProgram.AddUniform("s_mat", UniformType.Matrix4);
@@ -226,7 +231,7 @@ namespace OpenGL.Managers
 
         //private static int LightCenterPos = 0;
         //private static int LightMM = 0, LightVM = 0;
-        private static (uint,uint) GenerateFrameBuffer()
+        private (uint,uint) GenerateFrameBuffer()
         {
             uint fb = 0;
             GL.GenFramebuffers(1, out fb);
@@ -260,17 +265,17 @@ namespace OpenGL.Managers
             return (fb,fb_tex);
         }
 
-        private static void DebugCallback(DebugSource source, DebugType type, int id, DebugSeverity severity, int length, IntPtr message, IntPtr userParam)
+        private void DebugCallback(DebugSource source, DebugType type, int id, DebugSeverity severity, int length, IntPtr message, IntPtr userParam)
         {
             Debugger.Log($"Source: {source.ToString()}, Type: {type.ToString()}, ID: {id}, Severity: {severity.ToString()}, Message: {Marshal.PtrToStringAuto(message, length)}");
         }
 
-        static void BindInputs()
+        void BindInputs()
         {
             InputManager.Initialize(Window);
         }
 
-        static int CreateGLProgram(string name)
+        int CreateGLProgram(string name)
         {
             var vertexShader = CreateShader(ShaderType.VertexShader, $"{name}Vertex.vert");
             var fragmentShader = CreateShader(ShaderType.FragmentShader, $"{name}Fragment.frag");
@@ -285,9 +290,9 @@ namespace OpenGL.Managers
 
         }
 
-        static int CreateShader(ShaderType type, string shaderName)
+        int CreateShader(ShaderType type, string shaderName)
         {
-            var shaderFile = Assembly.GetExecutingAssembly().GetManifestResourceStream($"OpenGL.Shaders.{shaderName}");
+            var shaderFile = Assembly.GetExecutingAssembly().GetManifestResourceStream($"OEngine.Shaders.{shaderName}");
             string shaderSource = "";
             try
             {
@@ -311,7 +316,7 @@ namespace OpenGL.Managers
             return shader;
 
         }
-        static void UpdateFrameRate()
+        void UpdateFrameRate()
         {
             Frames++;
             if ((DateTime.Now - LastFrameRateUpdate).TotalSeconds >= 1)
@@ -322,13 +327,13 @@ namespace OpenGL.Managers
             }
         }
 
-        public static void SwitchProgram(GLProgram program)
+        void SwitchProgram(GLProgram program)
         {
             CurrentProgram = program;
             CurrentProgram.Use();
         }
 
-        public static void PreUpdate()
+        public void PreUpdate()
         {
             UpdateFrameRate();
             SwitchProgram(MainProgram);
@@ -344,8 +349,16 @@ namespace OpenGL.Managers
             CurrentProgram.UniformValue("stretch_scale", Scale);
         }
 
+        public void Update(float deltaTime)
+        {
+            //Rendering 
+            foreach (var sprite in Sprites)
+                sprite.Update(deltaTime);
 
-        public static void PostUpdate()
+        }
+
+
+        public void PostUpdate()
         {
             GL.DepthMask(true);
             GL.Disable(EnableCap.Blend);
@@ -355,7 +368,7 @@ namespace OpenGL.Managers
             GL.BindFramebuffer(FramebufferTarget.Framebuffer, LightningFBO.FramebufferID);
             SwitchProgram(LightProgram);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-            GL.ClearColor(0.03f, 0.03f, 0.03f, 1f);
+            GL.ClearColor(AmbientLight.X,AmbientLight.Y,AmbientLight.Z, 1f);
             GL.Enable(EnableCap.Blend);
             GL.DepthMask(false);
 
@@ -365,7 +378,7 @@ namespace OpenGL.Managers
             CurrentProgram.UniformValue("view", MainCamera.ViewMatrix);
             CurrentProgram.UniformValue("stretch_scale", Scale);
            
-            foreach (var light in SceneLights)
+            foreach (var light in Lights)
                 light.Update(0);
 
 
@@ -398,7 +411,7 @@ namespace OpenGL.Managers
 
         
 
-        public static Vector3 ScreenToWorldCoordinates(Vector2 screenCoordinates)
+        public Vector3 ScreenToWorldCoordinates(Vector2 screenCoordinates)
         {
             float normX = (2f * screenCoordinates.X) / Width - 1f;
             float normY = 1f - (2f * screenCoordinates.Y) / Height;
@@ -417,12 +430,12 @@ namespace OpenGL.Managers
             return rayWorld;
         }
 
-        public static void Shutdown()
+        public void Shutdown()
         {
 
         }
 
-        public static TextureImage LoadGLTexture(byte[] image, int width, int height)
+        public TextureImage LoadGLTexture(byte[] image, int width, int height)
         {
             
             
@@ -447,16 +460,26 @@ namespace OpenGL.Managers
             };
         }
 
-        public static void AddSceneLight(LightComponent light)
+
+
+        public void Subscribe(Renderer2DComponent component)
         {
-            SceneLights.Add(light);
+            Sprites.Add(component);
+        }
+        public void Subscribe(LightComponent component)
+        {
+            Lights.Add(component);
         }
 
-        public static void RemoveSceneLight(LightComponent light)
+        public void Unsubscribe(Renderer2DComponent component)
         {
-            SceneLights.Remove(light);
+            Sprites.Remove(component);
+        }
+        public void Unsubscribe(LightComponent component)
+        {
+            Lights.Remove(component);
         }
 
-       
+
     }
 }

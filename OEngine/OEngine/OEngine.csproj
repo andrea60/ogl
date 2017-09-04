@@ -53,6 +53,7 @@
     <Compile Include="ComponentSystem\Components\LightComponent.cs" />
     <Compile Include="ComponentSystem\Components\ParticleEmitterComponent.cs" />
     <Compile Include="ComponentSystem\Components\Renderer2DComponent.cs" />
+    <Compile Include="ComponentSystem\Components\ScriptComponent.cs" />
     <Compile Include="ComponentSystem\GameObject.cs" />
     <Compile Include="ComponentSystem\IComponent.cs" />
     <Compile Include="Debugger.cs" />
@@ -60,12 +61,16 @@
     <Compile Include="Factory\GameObjectFactory.cs" />
     <Compile Include="FBO.cs" />
     <Compile Include="GLProgram.cs" />
-    <Compile Include="Managers\DisplayManager.cs" />
-    <Compile Include="Managers\EntityManager.cs" />
-    <Compile Include="Managers\InputManager.cs" />
-    <Compile Include="Managers\ResourceManager.cs" />
+    <Compile Include="Scene.cs" />
+    <Compile Include="Systems\DisplayManager.cs" />
+    <Compile Include="Systems\EntityManager.cs" />
+    <Compile Include="Systems\InputManager.cs" />
+    <Compile Include="Systems\Managers.cs" />
+    <Compile Include="Systems\ResourceManager.cs" />
+    <Compile Include="Systems\ScriptManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Texture.cs" />
+    <Compile Include="World.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="OpenTK.dll.config" />

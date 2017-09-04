@@ -1,4 +1,4 @@
-﻿using OpenGL.Managers;
+﻿using OEngine.Managers;
 using OpenTK;
 using OpenTK.Graphics.OpenGL4;
 using System;
@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OpenGL.ComponentSystem.Components
+namespace OEngine.ComponentSystem.Components
 {
     [Component("Render2DComponent")]
     public class Renderer2DComponent : BaseComponent
@@ -17,7 +17,7 @@ namespace OpenGL.ComponentSystem.Components
         private float[] TextureUV;
         private uint VertexVBO;
         //private uint NormalsVBO;
-        private uint VAO;
+        public uint VAO;
         private uint TextureUVVBO;
 
         private Matrix4 TranslationMatrix;
@@ -35,13 +35,13 @@ namespace OpenGL.ComponentSystem.Components
             }
         }
 
-        public Renderer2DComponent()
+        public Renderer2DComponent() : base(Managers.Managers.RENDERER)
         {
             TranslationMatrix = Matrix4.Identity;
             ScaleMatrix = Matrix4.Identity;
             RotationMatrix = Matrix4.Identity;
         }
-        public Renderer2DComponent(TextureFrame texture)
+        public Renderer2DComponent(TextureFrame texture) : base(Managers.Managers.RENDERER)
         {
             Sprite = texture;
         }
@@ -135,7 +135,7 @@ namespace OpenGL.ComponentSystem.Components
 
             var modelMatrix = TranslationMatrix * ScaleMatrix * RotationMatrix;
 
-            DisplayManager.CurrentProgram.UniformValue("model", modelMatrix);
+            World.RenderSystem.CurrentProgram.UniformValue("model", modelMatrix);
             
             GL.BindVertexArray(VAO);
             GL.DrawArrays(PrimitiveType.Triangles, 0,6);
@@ -154,6 +154,15 @@ namespace OpenGL.ComponentSystem.Components
             };
             clone.Initialize();
             return clone;
+        }
+
+        public override void Subscribe()
+        {
+            World.RenderSystem.Subscribe(this);
+        }
+        public override void Unsubscribe()
+        {
+            World.RenderSystem.Unsubscribe(this);
         }
     }
 }

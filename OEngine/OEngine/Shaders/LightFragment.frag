@@ -23,10 +23,6 @@ void main()
 	if (d <= radius)
 		diffuse = pow(2.81, -k* d) * light_intensity;
 
-
-	
-
-
 	if (diffuse > 0.8)
 		diffuse = 0.8;
 	

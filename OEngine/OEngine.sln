@@ -5,7 +5,7 @@ VisualStudioVersion = 15.0.26430.16
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OEngine", "OEngine\OEngine.csproj", "{13660EF4-1391-480A-AE72-53A26CAE2CB4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenGL", "F:\MIscellaneous\Visual Studio 2017\Projects\OpenGL\OpenGL\OpenGL.csproj", "{24A47C7F-C266-4CE6-A4E6-C1C55273B990}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Farmery", "Farmery\Farmery.csproj", "{C5D14A27-1D82-469E-ADB1-4237970E239A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,10 +17,10 @@ Global
 		{13660EF4-1391-480A-AE72-53A26CAE2CB4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{13660EF4-1391-480A-AE72-53A26CAE2CB4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{13660EF4-1391-480A-AE72-53A26CAE2CB4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{24A47C7F-C266-4CE6-A4E6-C1C55273B990}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{24A47C7F-C266-4CE6-A4E6-C1C55273B990}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{24A47C7F-C266-4CE6-A4E6-C1C55273B990}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{24A47C7F-C266-4CE6-A4E6-C1C55273B990}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C5D14A27-1D82-469E-ADB1-4237970E239A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C5D14A27-1D82-469E-ADB1-4237970E239A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C5D14A27-1D82-469E-ADB1-4237970E239A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C5D14A27-1D82-469E-ADB1-4237970E239A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

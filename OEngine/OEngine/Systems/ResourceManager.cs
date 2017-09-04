@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OpenGL.Managers
+namespace OEngine.Managers
 {
     
    
@@ -18,7 +18,7 @@ namespace OpenGL.Managers
         public static TextureImage RegisterTexture(string textureName, string path)
         {
             var (data,w,h) = LoadImage(path);
-            var texture = DisplayManager.LoadGLTexture(data, w, h);
+            var texture = World.RenderSystem.LoadGLTexture(data, w, h);
             if (SceneTextures.Keys.Contains(textureName))
                 return null;
             SceneTextures.Add(textureName, texture);

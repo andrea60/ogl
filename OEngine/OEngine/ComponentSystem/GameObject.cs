@@ -5,11 +5,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OpenGL.ComponentSystem
+namespace OEngine.ComponentSystem
 {
     public class GameObject
     {
         protected string Name { get; set; }
+
+        public Managers.Managers Systems;
 
         public Vector3 _Position = new Vector3();
         public Vector3 _Scale = new Vector3(1, 1, 1);
@@ -94,6 +96,7 @@ namespace OpenGL.ComponentSystem
         public void RemoveComponent(BaseComponent component)
         {
             Components.Remove(component);
+            Systems &= ~(component.SystemManager);
         }
 
         public T GetComponent<T>(string name=null) where T : BaseComponent
@@ -120,6 +123,7 @@ namespace OpenGL.ComponentSystem
             if (component.GameObject != null && component.GameObject != this)
                 component.GameObject.RemoveComponent(component);
             component.GameObject = this;
+            Systems |= component.SystemManager;
             return true;
         }
 
@@ -138,11 +142,26 @@ namespace OpenGL.ComponentSystem
 
         }
 
+        public IEnumerable<BaseComponent> GetComponents(Managers.Managers handler)
+        {
+            foreach (var component in Components)
+                if (component.SystemManager == handler)
+                    yield return component;
+        }
+
         public void Update(float deltaTime)
         {
             foreach (var component in Components)
                 if (component.MustUpdateEachFrame())
                     component.Update(deltaTime);
+        }
+
+        public bool HasComponent<T>() where T : BaseComponent
+        {
+            for (var i = 0; i < Components.Count; i++)
+                if (Components[i] is T)
+                    return true;
+            return false;
         }
         
         public GameObject Clone()
@@ -163,6 +182,12 @@ namespace OpenGL.ComponentSystem
                 Components = copiedComponents,
                 Childs = copiedChilds
             };
+        }
+
+        public void Destroy()
+        {
+            foreach (var component in Components)
+                component.Dispose();
         }
 
     }

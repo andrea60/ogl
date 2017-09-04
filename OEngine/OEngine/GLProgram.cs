@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK;
 
-namespace OpenGL
+namespace OEngine
 {
     public class GLProgram
     {
