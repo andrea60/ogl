@@ -25,7 +25,7 @@ namespace OEngine.Managers
     {
         private bool Debug;
 
-        int Width = 1280, Height =720;
+        int Width = 1920, Height =1080;
         readonly int VWidth = 1280, VHeight = 720;
         Vector2 Scale;
 
@@ -60,13 +60,19 @@ namespace OEngine.Managers
         private List<Renderer2DComponent> Sprites = new List<Renderer2DComponent>();
         private List<LightComponent> Lights = new List<LightComponent>();
 
+        //PROVE
+        float[] VertexArray = new float[24*10000];
+        GLProgram BatchingProgram;
+        GCHandle VertexArrayHandle;
+
         public void Initialize(bool debug)
         {
+            VertexArrayHandle = GCHandle.Alloc(VertexArray, GCHandleType.Pinned);
             Debug = debug;
             var graphicsMode = new GraphicsMode(32, 24, 0, 8);
             var displayDevice = DisplayDevice.GetDisplay(DisplayIndex.First);
 
-            Window = new NativeWindow(Width, Height, "Prova", GameWindowFlags.FixedWindow,graphicsMode, displayDevice);
+            Window = new NativeWindow(Width, Height, "Prova", GameWindowFlags.Fullscreen,graphicsMode, displayDevice);
             
             Context = new GraphicsContext(graphicsMode, Window.WindowInfo, 4, 4, Debug ? GraphicsContextFlags.Debug : GraphicsContextFlags.Default);
             Context.MakeCurrent(Window.WindowInfo);
@@ -115,6 +121,11 @@ namespace OEngine.Managers
             LightProgram.AddUniform("light_intensity", UniformType.Float);
             LightProgram.AddUniform("stretch_scale", UniformType.Vector2);
             //GLLightingProgram = CreateGLProgram("Light");
+
+            BatchingProgram = new GLProgram(CreateGLProgram("Batching"));
+            BatchingProgram.AddUniform("stretch_scale", UniformType.Vector2);
+
+
 
             Debugger.Log($"Program Info log: {GL.GetProgramInfoLog(MainProgram.GLID)}");
             Debugger.Log($"Program Info log: {GL.GetProgramInfoLog(BlenderProgram.GLID)}");
@@ -351,9 +362,77 @@ namespace OEngine.Managers
 
         public void Update(float deltaTime)
         {
+            SwitchProgram(BatchingProgram);
+            CurrentProgram.UniformValue("stretch_scale", Scale);
+            GL.ActiveTexture(TextureUnit.Texture0);
+            GL.BindTexture(TextureTarget.Texture2D, ResourceManager.SceneTextures["main_tileset"].Frames[0,0].TextureImage.TextureID);
+            var i = 0;
+            foreach(var sprite in Sprites)
+            {
+                VertexArray[i++] = sprite.GameObject.Position.X;
+                VertexArray[i++] = sprite.GameObject.Position.Y;
+                VertexArray[i++] = sprite.TextureUV[0];
+                VertexArray[i++] = sprite.TextureUV[1];
+
+                VertexArray[i++] = sprite.GameObject.Position.X + sprite.GameObject.Scale.X;
+                VertexArray[i++] = sprite.GameObject.Position.Y - sprite.GameObject.Scale.Y;
+                VertexArray[i++] = sprite.TextureUV[2];
+                VertexArray[i++] = sprite.TextureUV[3];
+
+                VertexArray[i++] = sprite.GameObject.Position.X;
+                VertexArray[i++] = sprite.GameObject.Position.Y - sprite.GameObject.Scale.Y;
+                VertexArray[i++] = sprite.TextureUV[4];
+                VertexArray[i++] = sprite.TextureUV[5];
+
+                VertexArray[i++] = sprite.GameObject.Position.X;
+                VertexArray[i++] = sprite.GameObject.Position.Y;
+                VertexArray[i++] = sprite.TextureUV[6];
+                VertexArray[i++] = sprite.TextureUV[7];
+
+                VertexArray[i++] = sprite.GameObject.Position.X + sprite.GameObject.Scale.X;
+                VertexArray[i++] = sprite.GameObject.Position.Y;
+                VertexArray[i++] = sprite.TextureUV[8];
+                VertexArray[i++] = sprite.TextureUV[9];
+
+                VertexArray[i++] = sprite.GameObject.Position.X + sprite.GameObject.Scale.X;
+                VertexArray[i++] = sprite.GameObject.Position.Y - sprite.GameObject.Scale.Y;
+                VertexArray[i++] = sprite.TextureUV[10];
+                VertexArray[i++] = sprite.TextureUV[11];
+
+            }
+            var x = (uint)VertexArrayHandle.AddrOfPinnedObject();
+            GL.DrawElements(PrimitiveType.Triangles, Sprites.Count * 6 , DrawElementsType.UnsignedShort, (IntPtr)(x));
+            Console.WriteLine(GL.GetError());
+
+
             //Rendering 
-            foreach (var sprite in Sprites)
-                sprite.Update(deltaTime);
+            //var start = DateTime.Now;
+            //foreach (var sprite in Sprites)
+            //    RenderSprite(sprite);
+            //var end = DateTime.Now;
+           
+
+        }
+
+        private void RenderSprite(Renderer2DComponent sprite)
+        {
+
+          
+            sprite.TranslationMatrix[0, 3] = sprite.GameObject.Position.X;
+            sprite.TranslationMatrix[1, 3] = sprite.GameObject.Position.Y;
+            sprite.TranslationMatrix[2, 3] = sprite.GameObject.Position.Z;
+            var RotationMatrix = Matrix4.CreateFromQuaternion(sprite.GameObject.Rotation);
+            var ScaleMatrix = sprite.ScaleMatrix;
+            ScaleMatrix[0, 0] = sprite.GameObject.Scale.X;
+            ScaleMatrix[1, 1] = sprite.GameObject.Scale.Y;
+            ScaleMatrix[2, 2] = sprite.GameObject.Scale.Z;
+
+            var modelMatrix = sprite.TranslationMatrix * ScaleMatrix;
+            World.RenderSystem.CurrentProgram.UniformValue("model", modelMatrix);
+            GL.BindVertexArray(sprite.VAO);
+            GL.DrawArrays(PrimitiveType.Triangles, 0, 6);
+            
+
 
         }
 

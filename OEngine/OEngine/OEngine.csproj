@@ -89,6 +89,8 @@
     <EmbeddedResource Include="Shaders\LightVertex.vert">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
+    <EmbeddedResource Include="Shaders\BatchingFragment.frag" />
+    <EmbeddedResource Include="Shaders\BatchingVertex.vert" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -14,12 +14,22 @@ namespace Farmery.Scenes
     {
         public override void Load()
         {
-            CreateGameObject("tile1").AddComponent(new Renderer2DComponent(ResourceManager.SceneTextures["main_tileset"].Frames[0, 5]));
-            SceneObjects["tile1"].Scale = new Vector3(.1f, .1f, .1f);
-            SceneObjects["tile1"].Position += new Vector3(.2f, .2f, .2f);
-            SceneObjects["tile1"].AddComponent(new Scripts.TestScript());
+            //World.RenderSystem.MainCamera.Position = new Vector3(-.5f, -.5f, 0f);
+            const int xWidth = 10, yWidth = 10;
+            const float startX = -2.5f, startY = 1f;
+            for (var i = 0; i < xWidth; i++)
+                for (var j = 0; j < yWidth; j++)
+                {
+                    var name = $"tile_{i}_{j}";
+                    CreateGameObject(name);
+                    SceneObjects[name].AddComponent(new Renderer2DComponent(ResourceManager.SceneTextures["main_tileset"].Frames[0, 0]));
+                    SceneObjects[name].Scale = new Vector3(.1f, .1f, .1f);
+                    SceneObjects[name].Position += new Vector3(startX + (i*.1f), startY - (j*.1f), 0f);
+                    SceneObjects[name].AddComponent(new Scripts.TestScript());
+                }
+           
 
-            CreateGameObject("tile2").AddComponent(new Renderer2DComponent(ResourceManager.SceneTextures["main_tileset"].Frames[0, 5]));
+            CreateGameObject("tile2").AddComponent(new Renderer2DComponent(ResourceManager.SceneTextures["main_tileset"].Frames[0, 0]));
             SceneObjects["tile2"].Scale = new Vector3(.1f, .1f, .1f);
             SceneObjects["tile2"].Position += new Vector3(.3f, .2f, .2f);
 

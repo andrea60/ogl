@@ -44,6 +44,8 @@ namespace OEngine
             {
                 float delta = (float)(DateTime.Now - lastFrame).TotalSeconds;
                 lastFrame = DateTime.Now;
+
+                InputManager.GetKeyboardState();
                 RenderSystem.PreUpdate();
                 RenderSystem.Update(delta);
 

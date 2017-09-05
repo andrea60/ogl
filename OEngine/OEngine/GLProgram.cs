@@ -87,8 +87,9 @@ namespace OEngine
                     GL.Uniform1(GLID, f);
                     break;
                 case UniformType.Matrix3:
-                    var matrix3 = (Matrix3)value;
+                    var matrix3 = (Matrix3)value;                    
                     GL.UniformMatrix3(GLID, true, ref matrix3);
+                    
                     break;
                 case UniformType.Vector3:
                     var vector3 = (Vector3)value;

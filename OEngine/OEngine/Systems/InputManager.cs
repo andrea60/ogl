@@ -12,8 +12,10 @@ namespace OEngine
     {
         public static bool MouseDown;
         public static Point MousePosition { get; set; }
-        private static bool[] KeyPress = new bool[128];
+        private static bool[] LastKeyDown = new bool[(int)OpenTK.Input.Key.LastKey];
         private static bool[] KeyDown = new bool[(int)OpenTK.Input.Key.LastKey];
+
+        private static bool[] KeyboardBuffer = new bool[(int)OpenTK.Input.Key.LastKey];
 
         public static void Initialize(INativeWindow window)
         {
@@ -21,14 +23,17 @@ namespace OEngine
             window.MouseUp += OnMouseUp;
             window.KeyDown += OnKeyDown;
             window.KeyUp += OnKeyUp;
-            window.KeyPress += OnKeyPress;
+            //window.KeyPress += OnKeyPress;
             window.MouseMove += OnMouseMove;
+        }
+        public static void GetKeyboardState()
+        {
+            KeyDown =(bool[]) KeyboardBuffer.Clone();
         }
 
         public static void ResetPress()
         {
-            for (var i = 0; i < KeyPress.Length; i++)
-                KeyPress[i] = false;
+            LastKeyDown = (bool[])KeyDown.Clone();
         }
 
         private static void OnMouseMove(object sender, OpenTK.Input.MouseMoveEventArgs e)
@@ -36,20 +41,14 @@ namespace OEngine
             MousePosition = e.Position;
         }
 
-        private static void OnKeyPress(object sender, KeyPressEventArgs e)
-        {
-            
-            KeyPress[e.KeyChar] = true; 
-        }
-
         private static void OnKeyUp(object sender, OpenTK.Input.KeyboardKeyEventArgs e)
         {
-            KeyDown[(int)e.Key] = false;
+            KeyboardBuffer[(int)e.Key] = false;
         }
 
         private static void OnKeyDown(object sender, OpenTK.Input.KeyboardKeyEventArgs e)
         {
-            KeyDown[(int)e.Key] = true;
+            KeyboardBuffer[(int)e.Key] = true;
         }
 
         private static void OnMouseUp(object sender, OpenTK.Input.MouseButtonEventArgs e)
@@ -65,6 +64,11 @@ namespace OEngine
         public static bool IsKeyDown(OpenTK.Input.Key key)
         {
             return KeyDown[(int)key];
+        }
+
+        public static bool IsKeyPress(OpenTK.Input.Key key)
+        {
+            return KeyDown[(int)key] && !LastKeyDown[(int)key];
         }
     }
 }

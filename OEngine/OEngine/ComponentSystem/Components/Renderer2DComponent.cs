@@ -14,15 +14,15 @@ namespace OEngine.ComponentSystem.Components
     {
         private float[] Vertexes;
         private float[] Normals;
-        private float[] TextureUV;
+        public float[] TextureUV;
         private uint VertexVBO;
         //private uint NormalsVBO;
         public uint VAO;
         private uint TextureUVVBO;
 
-        private Matrix4 TranslationMatrix;
-        private Matrix4 ScaleMatrix;
-        private Matrix4 RotationMatrix;
+        public Matrix4 TranslationMatrix;
+        public Matrix4 ScaleMatrix;
+        public Matrix4 RotationMatrix;
         private TextureFrame _Sprite;
         public TextureFrame Sprite {
             get
