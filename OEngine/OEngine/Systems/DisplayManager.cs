@@ -25,7 +25,7 @@ namespace OEngine.Managers
     {
         private bool Debug;
 
-        int Width = 1920, Height =1080;
+        int Width = 1280, Height =720;
         readonly int VWidth = 1280, VHeight = 720;
         Vector2 Scale;
 
@@ -64,7 +64,8 @@ namespace OEngine.Managers
         float[] VertexArray = new float[24*10000];
         GLProgram BatchingProgram;
         GCHandle VertexArrayHandle;
-        uint VAVBO;
+        uint VAVBO, UVVBO;
+        uint VAVAO;
 
         public void Initialize(bool debug)
         {
@@ -125,7 +126,8 @@ namespace OEngine.Managers
 
             BatchingProgram = new GLProgram(CreateGLProgram("Batching"));
             BatchingProgram.AddUniform("stretch_scale", UniformType.Vector2);
-
+            BatchingProgram.AddUniform("view", UniformType.Matrix4);
+            BatchingProgram.AddUniform("scale", UniformType.Matrix4);
 
 
             Debugger.Log($"Program Info log: {GL.GetProgramInfoLog(MainProgram.GLID)}");
@@ -238,8 +240,56 @@ namespace OEngine.Managers
             GL.Viewport(0, 0, Width, Height);
 
             //PROVE
+            var test = new float[]
+            {
+               0,0,0,
+               0,0,
+
+               0,0,0,
+               0,0,
+
+               0,0,0,
+               0,0,
+
+               0,0,0,
+               0,0,
+
+               0,0,0,
+               0,0,
+
+               0,0,0,
+               0,0
+            };
+
+            var uvs = new float[]
+            {
+                0,1,
+                1,0,
+                0,0,
+                0,1,
+                1,1,
+                1,0
+            };
             GL.GenBuffers(1, out VAVBO);
             GL.BindBuffer(BufferTarget.ArrayBuffer, VAVBO);
+            GL.BufferData(BufferTarget.ArrayBuffer, sizeof(float) * test.Length, test, BufferUsageHint.StaticDraw);
+
+            
+            GL.GenBuffers(1, out UVVBO);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, UVVBO);
+            GL.BufferData(BufferTarget.ArrayBuffer, sizeof(float) * uvs.Length, uvs, BufferUsageHint.StaticDraw);
+
+            GL.GenVertexArrays(1, out VAVAO);
+            GL.BindVertexArray(VAVAO);
+
+            GL.EnableVertexAttribArray(0);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, VAVBO);
+            GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 0, 0);
+
+            GL.EnableVertexAttribArray(1);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, UVVBO);
+            GL.VertexAttribPointer(1, 2, VertexAttribPointerType.Float, false, 0, 0);
+
          
         }
 
@@ -362,52 +412,100 @@ namespace OEngine.Managers
             CurrentProgram.UniformValue("view", MainCamera.ViewMatrix);
             CurrentProgram.UniformValue("stretch_scale", Scale);
         }
+        bool first = true;
+        float[] UVArray;
 
         public void Update(float deltaTime)
         {
             SwitchProgram(BatchingProgram);
             CurrentProgram.UniformValue("stretch_scale", Scale);
+            CurrentProgram.UniformValue("view", MainCamera.ViewMatrix);
+            CurrentProgram.UniformValue("scale", MainCamera.ZoomMatrix);
             GL.ActiveTexture(TextureUnit.Texture0);
             GL.BindTexture(TextureTarget.Texture2D, ResourceManager.SceneTextures["main_tileset"].Frames[0,0].TextureImage.TextureID);
             var i = 0;
-            foreach(var sprite in Sprites)
+            var j = 0;
+            if (first)
             {
-                VertexArray[i++] = sprite.GameObject.Position.X;
-                VertexArray[i++] = sprite.GameObject.Position.Y;
-                VertexArray[i++] = sprite.TextureUV[0];
-                VertexArray[i++] = sprite.TextureUV[1];
-
-                VertexArray[i++] = sprite.GameObject.Position.X + sprite.GameObject.Scale.X;
-                VertexArray[i++] = sprite.GameObject.Position.Y - sprite.GameObject.Scale.Y;
-                VertexArray[i++] = sprite.TextureUV[2];
-                VertexArray[i++] = sprite.TextureUV[3];
-
-                VertexArray[i++] = sprite.GameObject.Position.X;
-                VertexArray[i++] = sprite.GameObject.Position.Y - sprite.GameObject.Scale.Y;
-                VertexArray[i++] = sprite.TextureUV[4];
-                VertexArray[i++] = sprite.TextureUV[5];
-
-                VertexArray[i++] = sprite.GameObject.Position.X;
-                VertexArray[i++] = sprite.GameObject.Position.Y;
-                VertexArray[i++] = sprite.TextureUV[6];
-                VertexArray[i++] = sprite.TextureUV[7];
-
-                VertexArray[i++] = sprite.GameObject.Position.X + sprite.GameObject.Scale.X;
-                VertexArray[i++] = sprite.GameObject.Position.Y;
-                VertexArray[i++] = sprite.TextureUV[8];
-                VertexArray[i++] = sprite.TextureUV[9];
-
-                VertexArray[i++] = sprite.GameObject.Position.X + sprite.GameObject.Scale.X;
-                VertexArray[i++] = sprite.GameObject.Position.Y - sprite.GameObject.Scale.Y;
-                VertexArray[i++] = sprite.TextureUV[10];
-                VertexArray[i++] = sprite.TextureUV[11];
-
+                VertexArray = new float[Sprites.Count * 18];
+                UVArray = new float[Sprites.Count * 12];
             }
-            var x = (uint)VertexArrayHandle.AddrOfPinnedObject();
+            var begin = DateTime.Now;
+            foreach (var sprite in Sprites)
+            {
+
+                if (first)
+                {
+                    VertexArray[i++] = sprite.GameObject.Position.X;
+                    VertexArray[i++] = sprite.GameObject.Position.Y + sprite.GameObject.Scale.Y;
+                    VertexArray[i++] = 0f;
+
+                    VertexArray[i++] = sprite.GameObject.Position.X + sprite.GameObject.Scale.X;
+                    VertexArray[i++] = sprite.GameObject.Position.Y;
+                    VertexArray[i++] = 0f;
+
+                    VertexArray[i++] = sprite.GameObject.Position.X;
+                    VertexArray[i++] = sprite.GameObject.Position.Y;
+                    VertexArray[i++] = 0f;
+
+                    VertexArray[i++] = sprite.GameObject.Position.X;
+                    VertexArray[i++] = sprite.GameObject.Position.Y + sprite.GameObject.Scale.Y;
+                    VertexArray[i++] = 0f;
+
+                    VertexArray[i++] = sprite.GameObject.Position.X + sprite.GameObject.Scale.X;
+                    VertexArray[i++] = sprite.GameObject.Position.Y + sprite.GameObject.Scale.Y;
+                    VertexArray[i++] = 0f;
+
+                    VertexArray[i++] = sprite.GameObject.Position.X + sprite.GameObject.Scale.X;
+                    VertexArray[i++] = sprite.GameObject.Position.Y;
+                    VertexArray[i++] = 0f;
+
+                }
+
+                  
+                UVArray[j++] = sprite.TextureUV[0];
+                UVArray[j++] = sprite.TextureUV[1];
+
+                   
+                UVArray[j++] = sprite.TextureUV[2];
+                UVArray[j++] = sprite.TextureUV[3];
+
+                    
+                UVArray[j++] = sprite.TextureUV[4];
+                UVArray[j++] = sprite.TextureUV[5];
+
+                 
+                UVArray[j++] = sprite.TextureUV[6];
+                UVArray[j++] = sprite.TextureUV[7];
+
+
+                   
+                UVArray[j++] = sprite.TextureUV[8];
+                UVArray[j++] = sprite.TextureUV[9];
+
+                    
+                UVArray[j++] = sprite.TextureUV[10];
+                UVArray[j++] = sprite.TextureUV[11];
+            }
+        
+
+
             GL.BindBuffer(BufferTarget.ArrayBuffer, VAVBO);
-            GL.BufferData(BufferTarget.ArrayBuffer, 4 * Sprites.Count, VertexArray, BufferUsageHint.StaticDraw);
-            GL.DrawArrays(PrimitiveType.Triangles, 0, Sprites.Count * 6);
-            Console.WriteLine(GL.GetError());
+            GL.BufferData(BufferTarget.ArrayBuffer, sizeof(float) * VertexArray.Length, VertexArray, BufferUsageHint.StaticDraw);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, UVVBO);
+            GL.BufferData(BufferTarget.ArrayBuffer, sizeof(float) * UVArray.Length, UVArray, BufferUsageHint.StaticDraw);
+
+
+            first = false;
+           
+           
+
+
+            GL.BindVertexArray(VAVAO);
+            GL.DrawArrays(PrimitiveType.Triangles, 0, 6*Sprites.Count);
+            var error = GL.GetError();
+            if (error != ErrorCode.NoError)
+                Console.WriteLine(error);
 
 
             //Rendering 

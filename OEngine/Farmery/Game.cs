@@ -16,7 +16,7 @@ namespace Farmery
         {
             Debugger.Init();
             World.Initialize();
-            ResourceManager.RegisterTexture("main_tileset", @"C:\Users\Andrea\Pictures\Tiles x32 test.png").Subdivide(1,1);
+            ResourceManager.RegisterTexture("main_tileset", @"C:\Users\Andrea\Pictures\Tiles x32 test.png").Subdivide(16,8);
 
         }
 

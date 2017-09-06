@@ -11,6 +11,8 @@ namespace OEngine
     {
         private Matrix4 TranslationMatrix = Matrix4.Identity;
         private Vector3 _Position = new Vector3(0f,0f,2f);
+        private float _Zoom = 1;
+        public Matrix4 ZoomMatrix = Matrix4.Identity;
 
         public Vector3 Position { get
             {
@@ -24,6 +26,22 @@ namespace OEngine
                 TranslationMatrix[2, 3] = -Position.Z;
             }
         }
+        public float Zoom
+        {
+            get
+            {
+                return _Zoom;
+            }
+            set
+            {
+                _Zoom = value;
+                ZoomMatrix[0, 0] = value;
+                ZoomMatrix[1, 1] = value;
+                ZoomMatrix[2, 2] = value;
+
+            }
+        }
+        
 
         public Matrix4 ViewMatrix
         {
@@ -31,6 +49,11 @@ namespace OEngine
             {
                 return TranslationMatrix; //aggiungere projection matrix e rotazioni se necessario
             }
+        }
+
+        public Camera()
+        {
+            Position = new Vector3(0, 0, 0);
         }
 
         public Matrix4 LookAt(Vector3 position)
