@@ -64,6 +64,7 @@ namespace OEngine.Managers
         float[] VertexArray = new float[24*10000];
         GLProgram BatchingProgram;
         GCHandle VertexArrayHandle;
+        uint VAVBO;
 
         public void Initialize(bool debug)
         {
@@ -72,7 +73,7 @@ namespace OEngine.Managers
             var graphicsMode = new GraphicsMode(32, 24, 0, 8);
             var displayDevice = DisplayDevice.GetDisplay(DisplayIndex.First);
 
-            Window = new NativeWindow(Width, Height, "Prova", GameWindowFlags.Fullscreen,graphicsMode, displayDevice);
+            Window = new NativeWindow(Width, Height, "Prova", GameWindowFlags.FixedWindow,graphicsMode, displayDevice);
             
             Context = new GraphicsContext(graphicsMode, Window.WindowInfo, 4, 4, Debug ? GraphicsContextFlags.Debug : GraphicsContextFlags.Default);
             Context.MakeCurrent(Window.WindowInfo);
@@ -236,7 +237,9 @@ namespace OEngine.Managers
             int vp_y = (Height / 2) - (height / 2);
             GL.Viewport(0, 0, Width, Height);
 
-            //TODO: remove, just for debug
+            //PROVE
+            GL.GenBuffers(1, out VAVBO);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, VAVBO);
          
         }
 
@@ -401,7 +404,9 @@ namespace OEngine.Managers
 
             }
             var x = (uint)VertexArrayHandle.AddrOfPinnedObject();
-            GL.DrawElements(PrimitiveType.Triangles, Sprites.Count * 6 , DrawElementsType.UnsignedShort, (IntPtr)(x));
+            GL.BindBuffer(BufferTarget.ArrayBuffer, VAVBO);
+            GL.BufferData(BufferTarget.ArrayBuffer, 4 * Sprites.Count, VertexArray, BufferUsageHint.StaticDraw);
+            GL.DrawArrays(PrimitiveType.Triangles, 0, Sprites.Count * 6);
             Console.WriteLine(GL.GetError());
 
 
