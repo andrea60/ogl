@@ -25,7 +25,7 @@ namespace Farmery.Scenes
                     var name = $"tile_{i}_{j}";
                     CreateGameObject(name);
                     var tileIndex = random.Next(5, 7);
-                    SceneObjects[name].AddComponent(new Renderer2DComponent(ResourceManager.SceneTextures["main_tileset"].Frames[0, tileIndex]));
+                    SceneObjects[name].AddComponent(new RenderTileComponent(ResourceManager.SceneTextures["main_tileset"].Frames[0, tileIndex]));
                    
                     SceneObjects[name].Scale = new Vector3(.05f, .05f, 0.05f);
                     SceneObjects[name].Position += new Vector3(startX + (i*.05f), startY - (j*.05f), 0f);

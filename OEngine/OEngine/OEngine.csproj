@@ -53,6 +53,7 @@
     <Compile Include="ComponentSystem\Components\LightComponent.cs" />
     <Compile Include="ComponentSystem\Components\ParticleEmitterComponent.cs" />
     <Compile Include="ComponentSystem\Components\Renderer2DComponent.cs" />
+    <Compile Include="ComponentSystem\Components\RenderTileComponent.cs" />
     <Compile Include="ComponentSystem\Components\ScriptComponent.cs" />
     <Compile Include="ComponentSystem\GameObject.cs" />
     <Compile Include="ComponentSystem\IComponent.cs" />
@@ -70,6 +71,7 @@
     <Compile Include="Systems\ScriptManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Texture.cs" />
+    <Compile Include="Tile\TileChunk.cs" />
     <Compile Include="World.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -1,4 +1,5 @@
 ﻿using OEngine.ComponentSystem.Components;
+using OEngine.Tile;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL4;
@@ -59,6 +60,8 @@ namespace OEngine.Managers
 
         private List<Renderer2DComponent> Sprites = new List<Renderer2DComponent>();
         private List<LightComponent> Lights = new List<LightComponent>();
+
+        private List<List<TileChunk>> TileChunks = new List<List<TileChunk>>();
 
         //PROVE
         float[] VertexArray = new float[24*10000];
@@ -423,96 +426,11 @@ namespace OEngine.Managers
             CurrentProgram.UniformValue("scale", MainCamera.ZoomMatrix);
             GL.ActiveTexture(TextureUnit.Texture0);
             GL.BindTexture(TextureTarget.Texture2D, ResourceManager.SceneTextures["main_tileset"].Frames[0,0].TextureImage.TextureID);
-            var i = 0;
-            var j = 0;
-            if (first)
-            {
-                VertexArray = new float[Sprites.Count * 18];
-                UVArray = new float[Sprites.Count * 12];
-            }
-            var begin = DateTime.Now;
-            foreach (var sprite in Sprites)
-            {
-
-                if (first)
-                {
-                    VertexArray[i++] = sprite.GameObject.Position.X;
-                    VertexArray[i++] = sprite.GameObject.Position.Y + sprite.GameObject.Scale.Y;
-                    VertexArray[i++] = 0f;
-
-                    VertexArray[i++] = sprite.GameObject.Position.X + sprite.GameObject.Scale.X;
-                    VertexArray[i++] = sprite.GameObject.Position.Y;
-                    VertexArray[i++] = 0f;
-
-                    VertexArray[i++] = sprite.GameObject.Position.X;
-                    VertexArray[i++] = sprite.GameObject.Position.Y;
-                    VertexArray[i++] = 0f;
-
-                    VertexArray[i++] = sprite.GameObject.Position.X;
-                    VertexArray[i++] = sprite.GameObject.Position.Y + sprite.GameObject.Scale.Y;
-                    VertexArray[i++] = 0f;
-
-                    VertexArray[i++] = sprite.GameObject.Position.X + sprite.GameObject.Scale.X;
-                    VertexArray[i++] = sprite.GameObject.Position.Y + sprite.GameObject.Scale.Y;
-                    VertexArray[i++] = 0f;
-
-                    VertexArray[i++] = sprite.GameObject.Position.X + sprite.GameObject.Scale.X;
-                    VertexArray[i++] = sprite.GameObject.Position.Y;
-                    VertexArray[i++] = 0f;
-
-                }
-
-                  
-                UVArray[j++] = sprite.TextureUV[0];
-                UVArray[j++] = sprite.TextureUV[1];
-
-                   
-                UVArray[j++] = sprite.TextureUV[2];
-                UVArray[j++] = sprite.TextureUV[3];
-
-                    
-                UVArray[j++] = sprite.TextureUV[4];
-                UVArray[j++] = sprite.TextureUV[5];
-
-                 
-                UVArray[j++] = sprite.TextureUV[6];
-                UVArray[j++] = sprite.TextureUV[7];
+            foreach (var chunk in TileChunks)
+                chunk.Draw();
 
 
-                   
-                UVArray[j++] = sprite.TextureUV[8];
-                UVArray[j++] = sprite.TextureUV[9];
-
-                    
-                UVArray[j++] = sprite.TextureUV[10];
-                UVArray[j++] = sprite.TextureUV[11];
-            }
-        
-
-
-            GL.BindBuffer(BufferTarget.ArrayBuffer, VAVBO);
-            GL.BufferData(BufferTarget.ArrayBuffer, sizeof(float) * VertexArray.Length, VertexArray, BufferUsageHint.StaticDraw);
-            GL.BindBuffer(BufferTarget.ArrayBuffer, UVVBO);
-            GL.BufferData(BufferTarget.ArrayBuffer, sizeof(float) * UVArray.Length, UVArray, BufferUsageHint.StaticDraw);
-
-
-            first = false;
-           
-           
-
-
-            GL.BindVertexArray(VAVAO);
-            GL.DrawArrays(PrimitiveType.Triangles, 0, 6*Sprites.Count);
-            var error = GL.GetError();
-            if (error != ErrorCode.NoError)
-                Console.WriteLine(error);
-
-
-            //Rendering 
-            //var start = DateTime.Now;
-            //foreach (var sprite in Sprites)
-            //    RenderSprite(sprite);
-            //var end = DateTime.Now;
+          
            
 
         }
@@ -660,6 +578,38 @@ namespace OEngine.Managers
         public void Unsubscribe(LightComponent component)
         {
             Lights.Remove(component);
+        }
+
+        public void Subscribe(RenderTileComponent component)
+        {
+            int x = component.TileMapX;
+            int y = component.TileMapY;
+
+            int chunkX = x / TileChunk.ChunkSize;
+            int chunkY = y / TileChunk.ChunkSize;
+
+            if (chunkX > TileChunks.Count)
+                TileChunks.Insert(chunkX,new List<TileChunk>());
+            if (chunkY > TileChunks[chunkX].Count)
+                TileChunks[chunkX].Insert(chunkY, new TileChunk());
+            TileChunks[chunkX][chunkY].AddTile(component, x, y);
+
+        }
+
+        public void Unsubscribe(RenderTileComponent component)
+        {
+            int x = component.TileMapX;
+            int y = component.TileMapY;
+
+            int chunkX = x / TileChunk.ChunkSize;
+            int chunkY = y / TileChunk.ChunkSize;
+
+            if (chunkX > TileChunks.Count)
+                TileChunks.Insert(chunkX, new List<TileChunk>());
+            if (chunkY > TileChunks[chunkX].Count)
+                TileChunks[chunkX].Insert(chunkY, new TileChunk());
+            TileChunks[chunkX][chunkY].RemoveTile(x, y);
+
         }
 
 

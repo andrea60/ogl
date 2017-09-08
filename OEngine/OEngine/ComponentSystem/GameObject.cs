@@ -118,11 +118,13 @@ namespace OEngine.ComponentSystem
         {
             if (Components.Any(c => c == component))
                 return false;
-            component.Initialize();
+            
             Components.Add(component);
             if (component.GameObject != null && component.GameObject != this)
                 component.GameObject.RemoveComponent(component);
+
             component.GameObject = this;
+            component.Initialize();
             Systems |= component.SystemManager;
             return true;
         }
