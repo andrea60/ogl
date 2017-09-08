@@ -18,7 +18,7 @@ namespace OEngine.ComponentSystem.Components
             throw new NotImplementedException();
         }
 
-        public override void Initialize()
+        public override void Init()
         {
             
         }

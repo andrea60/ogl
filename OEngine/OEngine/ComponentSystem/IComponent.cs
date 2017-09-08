@@ -21,7 +21,12 @@ namespace OEngine.ComponentSystem
         public Managers.Managers SystemManager;
 
         public abstract bool MustUpdateEachFrame();
-        public abstract void Initialize();
+        public void Initialize()
+        {
+            Init();
+            Subscribe();
+        }
+        public abstract void Init();
         public abstract void OnDestroy();
         public abstract void Subscribe();
         public abstract void Unsubscribe();
@@ -34,7 +39,7 @@ namespace OEngine.ComponentSystem
         public BaseComponent(Managers.Managers handler)
         {
             SystemManager = handler;
-            Subscribe();
+           
         }
         ~BaseComponent()
         {

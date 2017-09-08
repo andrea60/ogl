@@ -58,7 +58,7 @@ namespace OEngine.ComponentSystem.Components
                 sprite.DownRight.X,sprite.DownRight.Y
             };
         }
-        public override void Initialize()
+        public override void Init()
         {
             Vertexes = new float[]
             {

@@ -426,8 +426,9 @@ namespace OEngine.Managers
             CurrentProgram.UniformValue("scale", MainCamera.ZoomMatrix);
             GL.ActiveTexture(TextureUnit.Texture0);
             GL.BindTexture(TextureTarget.Texture2D, ResourceManager.SceneTextures["main_tileset"].Frames[0,0].TextureImage.TextureID);
-            foreach (var chunk in TileChunks)
-                chunk.Draw();
+            foreach (var chunkList in TileChunks)
+                foreach(var chunk in chunkList)
+                    chunk.Draw();
 
 
           
@@ -588,9 +589,9 @@ namespace OEngine.Managers
             int chunkX = x / TileChunk.ChunkSize;
             int chunkY = y / TileChunk.ChunkSize;
 
-            if (chunkX > TileChunks.Count)
+            if (chunkX >= TileChunks.Count)
                 TileChunks.Insert(chunkX,new List<TileChunk>());
-            if (chunkY > TileChunks[chunkX].Count)
+            if (chunkY >= TileChunks[chunkX].Count)
                 TileChunks[chunkX].Insert(chunkY, new TileChunk());
             TileChunks[chunkX][chunkY].AddTile(component, x, y);
 

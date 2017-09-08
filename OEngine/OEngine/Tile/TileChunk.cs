@@ -26,39 +26,65 @@ namespace OEngine.Tile
             {
                 Tiles[i] = new RenderTileComponent[ChunkSize];
             }
+            Initialize();
         }
 
         public void Initialize()
         {
             int i = 0;
-            for (var x = 0; x < ChunkSize; x++)
-                for (var y = 0; y < ChunkSize; y++)
-                {
-                    var tile = Tiles[x][y];
-                    VertexArray[i++] = tile.GameObject.Position.X;
-                    VertexArray[i++] = tile.GameObject.Position.Y + tile.GameObject.Scale.Y;
-                    VertexArray[i++] = 0f;
+            int j = 0;
+            //for (var x = 0; x < ChunkSize; x++)
+            //    for (var y = 0; y < ChunkSize; y++)
+            //    {
+            //        var tile = Tiles[x][y];
+            //        VertexArray[i++] = tile?.GameObject.Position.X ?? 0;
+            //        VertexArray[i++] = tile?.GameObject.Position.Y + tile.GameObject.Scale.Y ?? 0;
+            //        VertexArray[i++] = 0f;
 
-                    VertexArray[i++] = tile.GameObject.Position.X + tile.GameObject.Scale.X;
-                    VertexArray[i++] = tile.GameObject.Position.Y;
-                    VertexArray[i++] = 0f;
+            //        VertexArray[i++] = tile?.GameObject.Position.X + tile.GameObject.Scale.X ?? 0;
+            //        VertexArray[i++] = tile?.GameObject.Position.Y ?? 0;
+            //        VertexArray[i++] = 0f;
 
-                    VertexArray[i++] = tile.GameObject.Position.X;
-                    VertexArray[i++] = tile.GameObject.Position.Y;
-                    VertexArray[i++] = 0f;
+            //        VertexArray[i++] = tile?.GameObject.Position.X ?? 0;
+            //        VertexArray[i++] = tile?.GameObject.Position.Y ?? 0;
+            //        VertexArray[i++] = 0f;
 
-                    VertexArray[i++] = tile.GameObject.Position.X;
-                    VertexArray[i++] = tile.GameObject.Position.Y + tile.GameObject.Scale.Y;
-                    VertexArray[i++] = 0f;
+            //        VertexArray[i++] = tile?.GameObject.Position.X ?? 0;
+            //        VertexArray[i++] = tile?.GameObject.Position.Y + tile.GameObject.Scale.Y ?? 0;
+            //        VertexArray[i++] = 0f;
 
-                    VertexArray[i++] = tile.GameObject.Position.X + tile.GameObject.Scale.X;
-                    VertexArray[i++] = tile.GameObject.Position.Y + tile.GameObject.Scale.Y;
-                    VertexArray[i++] = 0f;
+            //        VertexArray[i++] = tile?.GameObject.Position.X + tile.GameObject.Scale.X ?? 0;
+            //        VertexArray[i++] = tile?.GameObject.Position.Y + tile.GameObject.Scale.Y ?? 0;
+            //        VertexArray[i++] = 0f;
 
-                    VertexArray[i++] = tile.GameObject.Position.X + tile.GameObject.Scale.X;
-                    VertexArray[i++] = tile.GameObject.Position.Y;
-                    VertexArray[i++] = 0f;
-                }
+            //        VertexArray[i++] = tile?.GameObject.Position.X + tile.GameObject.Scale.X ?? 0;
+            //        VertexArray[i++] = tile?.GameObject.Position.Y ?? 0;
+            //        VertexArray[i++] = 0f;
+
+            //        UVArray[j++] = tile?.TextureUV[0] ?? 0;
+            //        UVArray[j++] = tile?.TextureUV[1] ?? 0;
+
+
+            //        UVArray[j++] = tile?.TextureUV[2] ?? 0;
+            //        UVArray[j++] = tile?.TextureUV[3] ?? 0;
+
+
+            //        UVArray[j++] = tile?.TextureUV[4] ?? 0;
+            //        UVArray[j++] = tile?.TextureUV[5] ?? 0;
+
+
+            //        UVArray[j++] = tile?.TextureUV[6] ?? 0;
+            //        UVArray[j++] = tile?.TextureUV[7] ?? 0;
+
+
+
+            //        UVArray[j++] = tile?.TextureUV[8] ?? 0;
+            //        UVArray[j++] = tile?.TextureUV[9] ?? 0;
+
+
+            //        UVArray[j++] = tile?.TextureUV[10] ?? 0;
+            //        UVArray[j++] = tile?.TextureUV[11] ?? 0;
+            //    }
 
             GL.GenBuffers(1, out VAVBO);
             GL.BindBuffer(BufferTarget.ArrayBuffer,VAVBO);
@@ -84,40 +110,70 @@ namespace OEngine.Tile
 
         public void Draw()
         {
+            int i = 0;
             int j = 0;
             for(var x=0;x<ChunkSize;x++)
                 for(var y=0;y<ChunkSize;y++)
                 {
                     var tile = Tiles[x][y];
 
-                    UVArray[j++] = tile.TextureUV[0];
-                    UVArray[j++] = tile.TextureUV[1];
+                    UVArray[j++] = tile?.TextureUV[0] ?? 0;
+                    UVArray[j++] = tile?.TextureUV[1] ?? 0;
 
 
-                    UVArray[j++] = tile.TextureUV[2];
-                    UVArray[j++] = tile.TextureUV[3];
+                    UVArray[j++] = tile?.TextureUV[2] ?? 0;
+                    UVArray[j++] = tile?.TextureUV[3] ?? 0;
 
 
-                    UVArray[j++] = tile.TextureUV[4];
-                    UVArray[j++] = tile.TextureUV[5];
+                    UVArray[j++] = tile?.TextureUV[4] ?? 0;
+                    UVArray[j++] = tile?.TextureUV[5] ?? 0;
 
 
-                    UVArray[j++] = tile.TextureUV[6];
-                    UVArray[j++] = tile.TextureUV[7];
+                    UVArray[j++] = tile?.TextureUV[6] ?? 0;
+                    UVArray[j++] = tile?.TextureUV[7] ?? 0;
 
 
 
-                    UVArray[j++] = tile.TextureUV[8];
-                    UVArray[j++] = tile.TextureUV[9];
+                    UVArray[j++] = tile?.TextureUV[8] ?? 0;
+                    UVArray[j++] = tile?.TextureUV[9] ?? 0;
 
 
-                    UVArray[j++] = tile.TextureUV[10];
-                    UVArray[j++] = tile.TextureUV[11];
+                    UVArray[j++] = tile?.TextureUV[10] ?? 0;
+                    UVArray[j++] = tile?.TextureUV[11] ?? 0;
+
+
+                    VertexArray[i++] = tile?.GameObject.Position.X ?? 0;
+                    VertexArray[i++] = tile?.GameObject.Position.Y + tile.GameObject.Scale.Y ?? 0;
+                    VertexArray[i++] = 0f;
+
+                    VertexArray[i++] = tile?.GameObject.Position.X + tile.GameObject.Scale.X ?? 0;
+                    VertexArray[i++] = tile?.GameObject.Position.Y ?? 0;
+                    VertexArray[i++] = 0f;
+
+                    VertexArray[i++] = tile?.GameObject.Position.X ?? 0;
+                    VertexArray[i++] = tile?.GameObject.Position.Y ?? 0;
+                    VertexArray[i++] = 0f;
+
+                    VertexArray[i++] = tile?.GameObject.Position.X ?? 0;
+                    VertexArray[i++] = tile?.GameObject.Position.Y + tile.GameObject.Scale.Y ?? 0;
+                    VertexArray[i++] = 0f;
+
+                    VertexArray[i++] = tile?.GameObject.Position.X + tile.GameObject.Scale.X ?? 0;
+                    VertexArray[i++] = tile?.GameObject.Position.Y + tile.GameObject.Scale.Y ?? 0;
+                    VertexArray[i++] = 0f;
+
+                    VertexArray[i++] = tile?.GameObject.Position.X + tile.GameObject.Scale.X ?? 0;
+                    VertexArray[i++] = tile?.GameObject.Position.Y ?? 0;
+                    VertexArray[i++] = 0f;
+
 
                 }
 
             GL.BindBuffer(BufferTarget.ArrayBuffer,UVVBO);
-            GL.BufferSubData(BufferTarget.ArrayBuffer, IntPtr.Zero, sizeof(float) * UVArray.Length, UVArray);
+            GL.BufferData(BufferTarget.ArrayBuffer, IntPtr.Zero, sizeof(float) * UVArray.Length, UVArray);
+
+            GL.BindBuffer(BufferTarget.ArrayBuffer, VAVBO);
+            GL.BufferSubData(BufferTarget.ArrayBuffer, IntPtr.Zero, sizeof(float) * VertexArray.Length, VertexArray);
 
             GL.BindVertexArray(VAO);
             GL.DrawArrays(PrimitiveType.Triangles, 0, ChunkSize * ChunkSize);

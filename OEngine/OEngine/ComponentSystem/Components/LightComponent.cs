@@ -48,7 +48,7 @@ namespace OEngine.ComponentSystem.Components
         {
             Radius = 1f;   
         }
-        public override void Initialize()
+        public override void Init()
         {
             Vertexes = new float[]
             {

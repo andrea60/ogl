@@ -52,7 +52,7 @@ namespace OEngine.ComponentSystem.Components
             return new RenderTileComponent(Tile);
         }
 
-        public override void Initialize()
+        public override void Init()
         {
             
         }
@@ -69,12 +69,12 @@ namespace OEngine.ComponentSystem.Components
 
         public override void Subscribe()
         {
-            throw new NotImplementedException();
+            World.RenderSystem.Subscribe(this);
         }
 
         public override void Unsubscribe()
         {
-            throw new NotImplementedException();
+            World.RenderSystem.Unsubscribe(this);
         }
     }
 }
